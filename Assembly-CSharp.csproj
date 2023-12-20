@@ -65,6 +65,7 @@
     <Compile Include="Assets\Scripts\LeaveSlideScript.cs" />
     <Compile Include="Assets\Scripts\EnterScript.cs" />
     <Compile Include="Assets\Scripts\CamScript.cs" />
+    <Compile Include="Assets\Scripts\MenuScripts\MenuScript.cs" />
     <Compile Include="Assets\Scripts\SlideScript.cs" />
     <Compile Include="Assets\Scripts\PlayerControllerScr.cs" />
     <Compile Include="Assets\Scripts\ExitScript.cs" />
