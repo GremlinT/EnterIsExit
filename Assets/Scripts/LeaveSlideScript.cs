@@ -21,13 +21,12 @@ public class LeaveSlideScript : MonoBehaviour
     {
         GameObject _slide = Instantiate(slide, slidePos, playerTR.rotation);
         WorldStats.nombersOfSlides++;
-        //playerScr.pastSpavnPoint.position = _slide.transform.position;
     }
 
     private void FixedUpdate()
     {
         currentSlideTimer -= Time.deltaTime;
-        if (currentSlideTimer < 0 && playerScr.isMoveForward)
+        if (currentSlideTimer < 0 && playerScr.isMoveForward && !playerScr.isDead)
         {
             CreateSlide(playerTR.position);
             currentSlideTimer = slideTimer;

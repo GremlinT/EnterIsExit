@@ -7,42 +7,64 @@ public class MonsterController : MonoBehaviour
 {
     [SerializeField]
     Transform monsterTR;
+
+    public GameObject monsterPrefab;
     
     [SerializeField]
     float monsterSpeed, mosterRotationSpeed;
+        
+    [SerializeField]
+    public List<Transform> patrolPoints;
 
     [SerializeField]
-    int direction;
+    public bool isDead;
 
     [SerializeField]
-    Transform[] patrolPoints;
+    public bool isKilled;
 
     [SerializeField]
-    bool isDead;
+    GameObject deadGO;
 
-    [SerializeField]
-    bool isKilled;
+    public int currentPatrolPoint;
+    public bool pointsUpper = true;
+    public int monsterNomber;
 
-    private int currentPatrolPoint;
-    private bool pointsUpper = true;
+    private Rigidbody monsterRB;
 
-    private void Awake()
+    private int myNomber;
+
+    /*private void Awake()
     {
+        monsterRB = GetComponent<Rigidbody>();
         if (!isDead)
         {
             monsterTR.position = patrolPoints[0].position;
             currentPatrolPoint = 0;
+        }
+        else
+        {
+            
+
+        }
+    }*/
+
+    private void Start()
+    {
+        monsterRB = GetComponent<Rigidbody>();
+        if (!isDead)
+        {
+            monsterTR.position = patrolPoints[0].position;
+            currentPatrolPoint = 0;
+        }
+        if (this.gameObject.GetComponentInChildren<ParticleSystem>())
+        {
+            this.gameObject.GetComponentInChildren<ParticleSystem>().Play();
         }
     }
 
     private void MonsterMove()
     {
         monsterTR.position += monsterTR.forward * monsterSpeed * Time.deltaTime;
-    }
-
-    private void MonsterRotation()
-    {
-        monsterTR.Rotate(new Vector3(0f, direction, 0f) * mosterRotationSpeed * Time.deltaTime, Space.Self);
     }
 
     private void MonsterPatroling()
@@ -56,7 +78,7 @@ public class MonsterController : MonoBehaviour
         {
             nextPatrolPoint = currentPatrolPoint - 1;
         }
-        if (nextPatrolPoint < patrolPoints.Length && nextPatrolPoint >= 0)
+        if (nextPatrolPoint < patrolPoints.Count && nextPatrolPoint >= 0)
         {
             monsterTR.LookAt(patrolPoints[nextPatrolPoint]);
             if ((monsterTR.position - patrolPoints[nextPatrolPoint].position).sqrMagnitude > 0.1f)
@@ -84,10 +106,58 @@ public class MonsterController : MonoBehaviour
     private void MonsterDying()
     {
         isKilled = false;
+        GameObject _dead = Instantiate(deadGO, monsterTR);
         this.gameObject.tag = "DeadMonster";
-        monsterTR.position += new Vector3(0f, -1f, -1f);
-        monsterTR.eulerAngles = new Vector3(70f, 0f, 0f);
         this.gameObject.GetComponent<Collider>().isTrigger = true;
         isDead = true;
+        monsterRB.isKinematic = true;
+        monsterTR.Find("Model").gameObject.SetActive(false);
+        if (this.gameObject.GetComponentInChildren<ParticleSystem>())
+        {
+            this.gameObject.GetComponentInChildren<ParticleSystem>().Stop();
+        }
+        WorldStats.nomberOfDeadMonsters++;
+        Debug.Log("monseter die " + WorldStats.nomberOfDeadMonsters);
     }
+
+    private void MonsterRessurection()
+    {
+        isDead = false;
+        string deadName = deadGO.name + "(Clone)";
+        Destroy(monsterTR.Find(deadName).gameObject);
+        monsterRB.isKinematic = false;
+        monsterTR.Find("Model").gameObject.SetActive(true);
+        this.gameObject.GetComponent<Collider>().isTrigger = false;
+        if (this.gameObject.GetComponentInChildren<ParticleSystem>())
+        {
+            this.gameObject.GetComponentInChildren<ParticleSystem>().Play();
+        }
+        WorldStats.nomberOfDeadMonsters--;
+        Debug.Log("monseter res " + WorldStats.nomberOfDeadMonsters);
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (!isDead)
+        {
+            if (other.transform.name == "Sword")
+            {
+                MonsterDying();
+            }
+        }
+        else if (other.transform.name == "Player" && !other.GetComponent<PlayerControllerScr>().isMoveForward)
+        {
+            Invoke("MonsterRessurection", 1f);
+        }
+    }
+    
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.GetComponent<PlayerControllerScr>())
+        {
+            collision.gameObject.GetComponent<PlayerControllerScr>().PlayerDie();
+        }
+
+    }
+    
 }
