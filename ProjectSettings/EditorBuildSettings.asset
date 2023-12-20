@@ -6,7 +6,13 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/StartScene.unity
+    guid: 0d906ebb8ff0c80438ec37f4d18455cb
+  - enabled: 1
     path: Assets/Scenes/Dungeon.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
+  - enabled: 1
+    path: Assets/Scenes/WinScene.unity
+    guid: 70ba4d25e95c27b4aa158de69ce2bd0c
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0
